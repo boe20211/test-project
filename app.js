@@ -1911,4 +1911,35 @@ document.addEventListener('DOMContentLoaded', () => {
         buildHistogram();
         updateFlooding();
     });
+
+    // 6. Mobile Bottom Sheet Event Listeners
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarHandle = document.querySelector('.sidebar-handle');
+
+    if (sidebarHandle && sidebar) {
+        sidebarHandle.addEventListener('click', (e) => {
+            sidebar.classList.toggle('collapsed');
+            e.stopPropagation();
+        });
+
+        // Also allow clicking the header to expand if it is collapsed (improves mobile tap target area)
+        const sidebarHeader = document.querySelector('.sidebar-header');
+        if (sidebarHeader) {
+            sidebarHeader.addEventListener('click', (e) => {
+                if (sidebar.classList.contains('collapsed')) {
+                    sidebar.classList.remove('collapsed');
+                    e.stopPropagation();
+                }
+            });
+        }
+
+        // Prevent touch propagation on the sidebar to avoid dragging/moving the Leaflet map in the background
+        const stopTouchPropagation = (e) => {
+            e.stopPropagation();
+        };
+
+        sidebar.addEventListener('touchstart', stopTouchPropagation, { passive: true });
+        sidebar.addEventListener('touchmove', stopTouchPropagation, { passive: true });
+        sidebar.addEventListener('touchend', stopTouchPropagation, { passive: true });
+    }
 });

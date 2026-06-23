@@ -64,6 +64,10 @@ body {
     flex-shrink: 0;
 }
 
+.sidebar-handle {
+    display: none;
+}
+
 .sidebar-header {
     padding: 24px;
     border-bottom: 1px solid var(--border-color);
@@ -741,33 +745,110 @@ body {
 /* --- Responsive Adjustments --- */
 @media (max-width: 1024px) {
     .app-container {
-        flex-direction: column-reverse;
-    }
-    
-    .sidebar {
+        position: relative;
+        height: 100vh;
         width: 100%;
-        height: 45vh;
-        border-right: none;
-        border-top: 1px solid var(--border-color);
-        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+        display: block; /* Disable flex-direction column on mobile */
     }
     
     .map-wrapper {
-        height: 55vh;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1; /* Map in background */
     }
     
+    .sidebar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 60vh; /* High drawer height */
+        max-height: 80vh;
+        border-right: none;
+        border-top: 1px solid var(--border-color);
+        border-radius: 24px 24px 0 0;
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.65);
+        z-index: 1000; /* Sidebar floating on top */
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        padding-top: 0; /* Align to handle padding */
+        overflow-y: auto;
+    }
+    
+    /* Collapsed state: slide down so only the handle + logo/header is visible */
+    .sidebar.collapsed {
+        transform: translateY(calc(100% - 76px)); /* Leaves the handle and a small header visible */
+    }
+    
+    .sidebar-handle {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 12px 0 8px 0;
+        cursor: pointer;
+        width: 100%;
+        background: rgba(11, 15, 30, 0.75);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 24px 24px 0 0;
+        z-index: 1001;
+    }
+    
+    .handle-bar {
+        display: block;
+        width: 44px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.35);
+        border-radius: 2.5px;
+        transition: var(--transition-smooth);
+    }
+    
+    .sidebar-handle:hover .handle-bar {
+        background: rgba(255, 255, 255, 0.55);
+    }
+    
+    /* Larger city markers on mobile for easy finger-tapping */
+    .marker-pin, .special-marker-pin {
+        width: 18px !important;
+        height: 18px !important;
+        border-width: 2.5px !important;
+    }
+    
+    .custom-marker-wrapper {
+        width: 18px !important;
+        height: 18px !important;
+        margin-left: -9px !important;
+        margin-top: -9px !important;
+    }
+    
+    /* Responsive panel overrides */
     #hover-info-panel {
         top: 10px;
         right: 10px;
-        width: 200px;
-        padding: 10px;
+        width: 180px;
+        padding: 8px 12px;
+        font-size: 11px;
+        z-index: 99; /* Float above map but below drawer */
     }
     
     .legend-panel {
-        bottom: 10px;
+        bottom: 85px; /* Stand above the collapsed bottom sheet */
         right: 10px;
-        width: 160px;
-        padding: 10px;
+        width: 150px;
+        padding: 8px;
+        font-size: 10px;
+        z-index: 99;
+        transition: bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    
+    /* Push legend up when sidebar drawer is expanded */
+    .sidebar:not(.collapsed) ~ .map-wrapper .legend-panel, 
+    .sidebar:not(.collapsed) + .map-wrapper .legend-panel {
+        bottom: 62vh; /* Stand above expanded drawer */
     }
 }
 
