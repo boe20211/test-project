@@ -1,0 +1,1157 @@
+/* --- CSS Reset & Base Variables --- */
+:root {
+    --bg-main: #060913;
+    --bg-sidebar: #0b0f1e;
+    --bg-card: rgba(16, 22, 42, 0.65);
+    --bg-card-hover: rgba(22, 30, 58, 0.85);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --border-glow: rgba(0, 162, 255, 0.25);
+    
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    
+    --color-primary: #0070f3;
+    --color-primary-glow: rgba(0, 112, 243, 0.35);
+    --color-water: #00a2ff;
+    --color-water-shallow: #00f0ff;
+    --color-water-deep: #0044ff;
+    
+    --color-success: #10b981;
+    --color-warning: #f59e0b;
+    --color-danger: #ef4444;
+    --color-danger-glow: rgba(239, 68, 68, 0.15);
+    
+    --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    
+    --shadow-premium: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* --- Layout --- */
+.app-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* --- Sidebar Style --- */
+.sidebar {
+    width: 400px;
+    background-color: var(--bg-sidebar);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    z-index: 10;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+    flex-shrink: 0;
+}
+
+.sidebar-header {
+    padding: 24px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icon {
+    width: 32px;
+    height: 32px;
+    color: var(--color-water);
+}
+
+.animate-wave {
+    animation: wave-float 3s ease-in-out infinite;
+}
+
+@keyframes wave-float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-4px) rotate(5deg); }
+}
+
+.logo-area h1 {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, #ffffff 0%, #a5d8ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.logo-area .subtitle {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: var(--font-heading);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Custom Scrollbar for Sidebar */
+.sidebar-content::-webkit-scrollbar {
+    width: 6px;
+}
+.sidebar-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+.sidebar-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+.sidebar-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* --- Cards (Glassmorphism) --- */
+.card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 20px;
+    transition: var(--transition-smooth);
+}
+
+.card:hover {
+    background: var(--bg-card-hover);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.card-header {
+    margin-bottom: 16px;
+}
+
+.card-title {
+    font-family: var(--font-heading);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-title i {
+    width: 18px;
+    height: 18px;
+    color: var(--color-water);
+}
+
+/* --- Control Card Elements --- */
+.slider-display {
+    text-align: center;
+    margin-bottom: 15px;
+    font-family: var(--font-heading);
+}
+
+.value-number {
+    font-size: 56px;
+    font-weight: 800;
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(0, 162, 255, 0.4);
+    line-height: 1;
+    display: inline-block;
+    transition: var(--transition-smooth);
+}
+
+.value-unit {
+    font-size: 16px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-left: 6px;
+}
+
+.slider-container {
+    margin-bottom: 20px;
+}
+
+.custom-slider {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    outline: none;
+    margin-bottom: 10px;
+    transition: var(--transition-smooth);
+}
+
+.custom-slider:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.custom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 3px solid var(--color-primary);
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 112, 243, 0.8);
+    transition: var(--transition-smooth);
+}
+
+.custom-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+    box-shadow: 0 0 15px rgba(0, 162, 255, 1);
+}
+
+.slider-ticks {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 500;
+    padding: 0 4px;
+}
+
+/* Extreme Mode Switch */
+.extreme-mode-toggle {
+    margin-bottom: 20px;
+    padding: 10px 12px;
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px dashed rgba(239, 68, 68, 0.2);
+    border-radius: 8px;
+}
+
+.switch-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    width: 100%;
+}
+
+.switch-text {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.switch-wrapper {
+    position: relative;
+    width: 38px;
+    height: 20px;
+}
+
+.switch-wrapper input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.15);
+    transition: .3s;
+    border-radius: 20px;
+}
+
+.switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+}
+
+.switch-wrapper input:checked + .switch-slider {
+    background-color: var(--color-danger);
+}
+
+.switch-wrapper input:checked + .switch-slider:before {
+    transform: translateX(18px);
+}
+
+/* Buttons */
+.control-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    border: none;
+    outline: none;
+}
+
+.btn-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.btn-primary {
+    background: var(--color-primary);
+    color: #ffffff;
+    box-shadow: 0 4px 12px var(--color-primary-glow);
+}
+
+.btn-primary:hover {
+    background: #0080ff;
+    box-shadow: 0 6px 18px rgba(0, 112, 243, 0.5);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(1px);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* --- Statistics Card Elements --- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
+}
+
+.stat-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.stat-value {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.text-danger {
+    color: var(--color-danger) !important;
+}
+
+.text-warning {
+    color: var(--color-warning) !important;
+}
+
+/* --- Vulnerable Regions Card Elements --- */
+.region-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.region-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 10px;
+    transition: var(--transition-smooth);
+}
+
+.region-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.region-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.region-status {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-family: var(--font-heading);
+}
+
+.status-safe {
+    background: rgba(16, 185, 129, 0.12);
+    color: var(--color-success);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.status-warning {
+    background: rgba(245, 158, 11, 0.12);
+    color: var(--color-warning);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    animation: pulse-glow-warning 2s infinite;
+}
+
+.status-danger {
+    background: rgba(239, 68, 68, 0.12);
+    color: var(--color-danger);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    animation: pulse-glow-danger 2s infinite;
+}
+
+@keyframes pulse-glow-warning {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.2); }
+    50% { box-shadow: 0 0 8px 2px rgba(245, 158, 11, 0.4); }
+}
+
+@keyframes pulse-glow-danger {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2); }
+    50% { box-shadow: 0 0 8px 2px rgba(239, 68, 68, 0.4); }
+}
+
+/* --- Info Card Elements --- */
+.info-text {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+.info-text:last-child {
+    margin-bottom: 0;
+}
+
+.info-text.highlight {
+    padding: 10px;
+    background: rgba(0, 112, 243, 0.05);
+    border-left: 3px solid var(--color-primary);
+    border-radius: 0 6px 6px 0;
+    color: var(--text-primary);
+}
+
+/* --- Sidebar Footer --- */
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* --- Map Wrapper Area --- */
+.map-wrapper {
+    flex: 1;
+    height: 100%;
+    position: relative;
+    background-color: #0b0f19;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+/* --- Map Overlay Panels --- */
+.map-overlay-panel {
+    position: absolute;
+    z-index: 999; /* Float on top of Leaflet */
+    background: rgba(11, 15, 30, 0.75);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 16px;
+    color: var(--text-primary);
+    box-shadow: var(--shadow-premium);
+    transition: var(--transition-smooth);
+}
+
+/* Hover Info Panel (Top Right) */
+#hover-info-panel {
+    top: 20px;
+    right: 20px;
+    width: 250px;
+    pointer-events: none; /* Let clicks pass through to map */
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 8px;
+}
+
+.panel-header span {
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.panel-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--color-water);
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.info-row:last-child {
+    margin-bottom: 0;
+}
+
+.info-label {
+    color: var(--text-secondary);
+}
+
+.info-val {
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.highlight-val {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--color-water-shallow) !important;
+}
+
+/* Legend Panel (Bottom Right) */
+.legend-panel {
+    bottom: 20px;
+    right: 20px;
+    width: 200px;
+}
+
+.legend-title {
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 6px;
+    color: var(--text-primary);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+}
+
+.legend-item:last-child {
+    margin-bottom: 0;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    flex-shrink: 0;
+}
+
+/* Legend Colors matching custom canvas styling */
+.legend-color.water-deep {
+    background-color: rgba(0, 68, 255, 0.7);
+}
+.legend-color.water-medium {
+    background-color: rgba(0, 162, 255, 0.6);
+}
+.legend-color.water-shallow {
+    background-color: rgba(0, 240, 255, 0.5);
+}
+.legend-color.land-low {
+    background-color: rgba(239, 68, 68, 0.15);
+    border: 1px dashed rgba(239, 68, 68, 0.5);
+}
+.legend-color.land-high {
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* --- Leaflet Custom Styles --- */
+.leaflet-container {
+    background: #0b0f19 !important;
+}
+
+/* Sleek modern Leaflet zoom controls */
+.leaflet-bar {
+    border: 1px solid var(--border-color) !important;
+    box-shadow: var(--shadow-premium) !important;
+    border-radius: 8px !important;
+    overflow: hidden;
+}
+
+.leaflet-bar a {
+    background-color: rgba(11, 15, 30, 0.85) !important;
+    backdrop-filter: blur(8px) !important;
+    color: var(--text-primary) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    transition: var(--transition-smooth);
+}
+
+.leaflet-bar a:hover {
+    background-color: var(--bg-card-hover) !important;
+    color: #ffffff !important;
+}
+
+/* Custom Marker Styling */
+.custom-city-marker {
+    background: transparent;
+    border: none;
+}
+
+.marker-pin {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 8px rgba(0, 112, 243, 0.8);
+    transition: var(--transition-smooth);
+}
+
+.marker-pin.flooded {
+    background: var(--color-danger);
+    box-shadow: 0 0 10px var(--color-danger);
+    animation: marker-pulse-danger 1.5s infinite;
+}
+
+@keyframes marker-pulse-danger {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); box-shadow: 0 0 15px rgba(239, 68, 68, 0.8); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.marker-label {
+    position: absolute;
+    left: 18px;
+    top: -4px;
+    white-space: nowrap;
+    background: rgba(11, 15, 30, 0.85);
+    backdrop-filter: blur(4px);
+    border: 1px solid var(--border-color);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-family: var(--font-heading);
+    
+    /* Hide by default for clutter-free look at low zoom */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-5px);
+    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                visibility 0.2s;
+}
+
+.marker-label.flooded {
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #ff9999;
+}
+
+/* Hover to reveal label at any zoom level */
+.custom-marker-wrapper:hover .marker-label {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    z-index: 99999;
+}
+
+/* Automatically show all labels when zoomed in (high space) */
+#map.show-all-labels .marker-label {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 1024px) {
+    .app-container {
+        flex-direction: column-reverse;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: 45vh;
+        border-right: none;
+        border-top: 1px solid var(--border-color);
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+    }
+    
+    .map-wrapper {
+        height: 55vh;
+    }
+    
+    #hover-info-panel {
+        top: 10px;
+        right: 10px;
+        width: 200px;
+        padding: 10px;
+    }
+    
+    .legend-panel {
+        bottom: 10px;
+        right: 10px;
+        width: 160px;
+        padding: 10px;
+    }
+}
+
+/* --- Special User Custom Markers --- */
+.special-marker-pin {
+    width: 12px;
+    height: 12px;
+    background: #f59e0b; /* Amber/Gold */
+    border: 2px solid #ffffff;
+    transform: rotate(45deg); /* Diamond shape! */
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.8);
+    transition: var(--transition-smooth);
+}
+
+.special-marker-pin.flooded {
+    background: var(--color-danger);
+    box-shadow: 0 0 12px var(--color-danger);
+    animation: special-marker-pulse-danger 1.5s infinite;
+}
+
+@keyframes special-marker-pulse-danger {
+    0% { transform: rotate(45deg) scale(1); opacity: 1; }
+    50% { transform: rotate(45deg) scale(1.3); box-shadow: 0 0 15px rgba(239, 68, 68, 0.9); }
+    100% { transform: rotate(45deg) scale(1); opacity: 1; }
+}
+
+.marker-label.special {
+    border-color: rgba(245, 158, 11, 0.35);
+    color: #ffe0b2;
+    background: rgba(18, 14, 8, 0.9);
+}
+
+.marker-label.special.flooded {
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #ff9999;
+}
+
+/* --- Tab Switcher & Tab Panels --- */
+.tab-switcher {
+    display: flex;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 3px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.tab-btn {
+    flex: 1;
+    background: transparent;
+    border: 1px solid transparent;
+    outline: none;
+    color: var(--text-muted);
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 8px 4px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.tab-btn:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.tab-btn.active {
+    color: var(--color-primary);
+    background: rgba(59, 130, 246, 0.12);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.15);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeInTab 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInTab {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Customizing Leaflet Layer Control for Dark Theme */
+.leaflet-control-layers {
+    background: rgba(11, 15, 30, 0.85) !important;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    font-family: var(--font-heading) !important;
+    font-size: 11px !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+.leaflet-control-layers-overlays label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.leaflet-control-layers-overlays label:last-child {
+    margin-bottom: 0;
+}
+
+.leaflet-control-layers-overlays label:hover {
+    color: var(--color-primary);
+}
+
+.leaflet-control-layers-overlays input[type="checkbox"] {
+    cursor: pointer;
+    accent-color: var(--color-primary);
+    width: 14px;
+    height: 14px;
+}
+
+/* ==========================================================================
+   Premium Glassmorphic Marker Clusters (Taiwan-only)
+   ========================================================================== */
+.marker-cluster {
+    background-clip: padding-box;
+    border-radius: 50% !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.marker-cluster div {
+    width: 30px !important;
+    height: 30px !important;
+    margin-left: 5px !important;
+    margin-top: 5px !important;
+    text-align: center;
+    border-radius: 50% !important;
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffffff !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+}
+
+/* Glassmorphic Small Cluster (Cyan/Blue for Taiwan) */
+.marker-cluster-small {
+    background-color: rgba(6, 182, 212, 0.2) !important;
+    border: 2px solid rgba(6, 182, 212, 0.6) !important;
+    box-shadow: 0 0 14px rgba(6, 182, 212, 0.45) !important;
+}
+.marker-cluster-small div {
+    background-color: rgba(15, 23, 42, 0.85) !important;
+    border: 1px solid rgba(6, 182, 212, 0.3) !important;
+}
+
+/* Glassmorphic Medium Cluster (Orange/Yellow for Taiwan) */
+.marker-cluster-medium {
+    background-color: rgba(245, 158, 11, 0.2) !important;
+    border: 2px solid rgba(245, 158, 11, 0.6) !important;
+    box-shadow: 0 0 14px rgba(245, 158, 11, 0.45) !important;
+}
+.marker-cluster-medium div {
+    background-color: rgba(15, 23, 42, 0.85) !important;
+    border: 1px solid rgba(245, 158, 11, 0.3) !important;
+}
+
+/* Glassmorphic Large Cluster (Red for Taiwan) */
+.marker-cluster-large {
+    background-color: rgba(239, 68, 68, 0.2) !important;
+    border: 2px solid rgba(239, 68, 68, 0.6) !important;
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.45) !important;
+}
+.marker-cluster-large div {
+    background-color: rgba(15, 23, 42, 0.85) !important;
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
+}
+
+/* Hover effects for clusters */
+.marker-cluster:hover {
+    transform: scale(1.15);
+    box-shadow: 0 0 24px rgba(255, 255, 255, 0.25) !important;
+    cursor: pointer;
+}
+
+/* ==========================================================================
+   Tides & Climate Simulation Scenarios
+   ========================================================================== */
+.scenario-selector-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.scenario-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scenario-option:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.scenario-option.active {
+    background: rgba(6, 182, 212, 0.06);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.1);
+}
+
+.scenario-radio {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.scenario-option.active .scenario-radio {
+    border-color: var(--color-primary);
+}
+
+.scenario-option.active .scenario-radio::after {
+    content: "";
+    position: absolute;
+    top: 2.5px;
+    left: 2.5px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    box-shadow: 0 0 6px var(--color-primary);
+}
+
+.scenario-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.scenario-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #f1f5f9;
+}
+
+.scenario-desc {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    line-height: 1.2;
+}
+
+/* Effective Sea Level Badge styling */
+.slider-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.slider-display-main {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 4px;
+}
+
+.effective-sea-level-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #f43f5e;
+    background: rgba(244, 63, 94, 0.12);
+    border: 1px solid rgba(244, 63, 94, 0.3);
+    padding: 3px 8px;
+    border-radius: 20px;
+    margin-top: 2px;
+    box-shadow: 0 0 8px rgba(244, 63, 94, 0.15);
+    animation: pulseGlow 2s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 0 8px rgba(244, 63, 94, 0.15);
+        border-color: rgba(244, 63, 94, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 14px rgba(244, 63, 94, 0.3);
+        border-color: rgba(244, 63, 94, 0.5);
+    }
+}
+
+/* --- Defense & Advanced Settings Cards (New) --- */
+.defense-controls, .advanced-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.control-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.control-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.slider-val-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.small-slider {
+    flex: 1;
+    margin-bottom: 0 !important;
+}
+
+.slider-val-display {
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-water-shallow);
+    min-width: 32px;
+    text-align: right;
+}
+
+.button-group {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.btn-sm {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+    border-radius: 8px !important;
+}
+
+.draw-tip {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.4;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 6px;
+    border-left: 2px solid var(--color-warning);
+}
+
+/* Active drawing state on map */
+.drawing-active {
+    cursor: crosshair !important;
+}
+
+/* Style for active drawing button */
+.btn-drawing-active {
+    background: var(--color-warning) !important;
+    color: #000000 !important;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.5) !important;
+    border-color: var(--color-warning) !important;
+}
+

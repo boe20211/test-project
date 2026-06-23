@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>台灣海平面上升與地勢淹水模擬互動地圖 | Taiwan Flood Simulator</title>
+    <meta name="description" content="互動式台灣海平面上升淹水模擬工具。基於高精度高程數據（DEM），即時展示不同海平面上升高度下台灣各地的淹水範圍、受災面積及受影響人口估算。">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <!-- Leaflet MarkerCluster CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Controls & Stats -->
+        <aside class="sidebar">
+            <header class="sidebar-header">
+                <div class="logo-area">
+                    <i data-lucide="waves" class="logo-icon animate-wave"></i>
+                    <div>
+                        <h1>台灣淹水模擬器</h1>
+                        <p class="subtitle">Taiwan Sea-Level Rise Simulator</p>
+                    </div>
+                </div>
+            </header>
+
+            <div class="sidebar-content">
+                <!-- Control Card -->
+                <section class="card control-card">
+                    <div class="card-header">
+                        <h2 class="card-title"><i data-lucide="sliders"></i> 海平面上升控制</h2>
+                    </div>
+                    
+                    <div class="slider-display">
+                        <div class="slider-display-main">
+                            <span class="value-number" id="sea-level-val">0</span>
+                            <span class="value-unit">公尺 (m)</span>
+                        </div>
+                        <div class="effective-sea-level-badge" id="effective-sea-level-container" style="display: none; font-size: 11px; padding: 4px 12px; border-radius: 20px;">
+                            實質水位: MSL (<span id="msl-val">0</span>m) + 氣候差值 (<span id="tide-offset-val">+0.0m</span>) = <span id="effective-sea-level-val">0.0</span>m
+                        </div>
+                    </div>
+                    
+                    <div class="slider-container">
+                        <input type="range" id="sea-level-slider" min="0" max="100" value="0" step="1" class="custom-slider">
+                        <div class="slider-ticks">
+                            <span>0m</span>
+                            <span>20m</span>
+                            <span>40m</span>
+                            <span>60m</span>
+                            <span>80m</span>
+                            <span>100m</span>
+                        </div>
+                    </div>
+
+                    <div class="extreme-mode-toggle">
+                        <label class="switch-label" for="extreme-mode">
+                            <span class="switch-text">啟用極端淹水模擬 (最高 500m)</span>
+                            <div class="switch-wrapper">
+                                <input type="checkbox" id="extreme-mode">
+                                <span class="switch-slider"></span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="control-actions">
+                        <button id="btn-play" class="btn btn-primary">
+                            <i data-lucide="play" class="btn-icon"></i> <span id="play-text">自動播放</span>
+                        </button>
+                        <button id="btn-reset" class="btn btn-secondary">
+                            <i data-lucide="rotate-ccw" class="btn-icon"></i> 重設
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Scenario Selector Card -->
+                <section class="card scenario-card">
+                    <div class="card-header">
+                        <h2 class="card-title"><i data-lucide="cloud-lightning"></i> 潮汐與氣候模擬情境</h2>
+                    </div>
+                    <div class="scenario-selector-container">
+                        <div class="scenario-option active" data-scenario="normal">
+                            <div class="scenario-radio"></div>
+                            <div class="scenario-info">
+                                <span class="scenario-name">🌊 日常潮位 (Standard Sea Level)</span>
+                                <span class="scenario-desc">無附加潮位變數（基準線 +0m）</span>
+                            </div>
+                        </div>
+                        <div class="scenario-option" data-scenario="spring-tide">
+                            <div class="scenario-radio"></div>
+                            <div class="scenario-info">
+                                <span class="scenario-name">🌕 天文大潮 (Spring Tide)</span>
+                                <span class="scenario-desc">納入天文滿潮/大潮影響（基準線 +1.5m）</span>
+                            </div>
+                        </div>
+                        <div class="scenario-option" data-scenario="storm-surge">
+                            <div class="scenario-radio"></div>
+                            <div class="scenario-info">
+                                <span class="scenario-name">🌀 颱風暴潮 (Storm Surge)</span>
+                                <span class="scenario-desc">極端颱風引發之暴潮溢流（基準線 +3.5m）</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Flood Defense Card (New) -->
+                <section class="card defense-card">
+                    <div class="card-header">
+                        <h2 class="card-title"><i data-lucide="shield"></i> 防禦工程與屏障</h2>
+                    </div>
+                    <div class="defense-controls">
+                        <label class="switch-label" for="enable-defenses">
+                            <span class="switch-text">啟用人工防禦堤防 (Enable Levees)</span>
+                            <div class="switch-wrapper">
+                                <input type="checkbox" id="enable-defenses">
+                                <span class="switch-slider"></span>
+                            </div>
+                        </label>
+                        
+                        <div id="defense-draw-controls" style="margin-top: 12px; display: none;">
+                            <div class="control-row">
+                                <span class="control-label" style="font-size: 11px; color: var(--text-secondary);">設定堤防設計高度:</span>
+                                <div class="slider-val-row">
+                                    <input type="range" id="levee-height-slider" min="2" max="20" value="6" step="1" class="custom-slider small-slider">
+                                    <span class="slider-val-display"><span id="levee-height-val">6</span>m</span>
+                                </div>
+                            </div>
+                            <div class="button-group">
+                                <button id="btn-draw-levee" class="btn btn-secondary btn-sm" style="flex: 1.5;">
+                                    <i data-lucide="pencil" class="btn-icon"></i> 繪製防洪堤
+                                </button>
+                                <button id="btn-clear-levees" class="btn btn-secondary btn-sm" style="flex: 1;">
+                                    <i data-lucide="trash-2" class="btn-icon"></i> 清除
+                                </button>
+                            </div>
+                            <div class="draw-tip" style="margin-top: 8px;">
+                                💡 點擊「繪製防洪堤」並在地圖上點擊以劃定堤防線，雙擊或按 Esc 即可完成。洪水填充演算法將無法跨越該高度的堤防。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Advanced Terrain Calibration Card (New) -->
+                <section class="card advanced-card">
+                    <div class="card-header">
+                        <h2 class="card-title"><i data-lucide="settings-2"></i> 高程數據校正</h2>
+                    </div>
+                    <div class="advanced-controls">
+                        <div class="control-row" style="margin-bottom: 4px;">
+                            <span class="control-label">高程數據解碼模式 (Decoding Mode):</span>
+                            <select id="decoding-mode-select" style="background: rgba(11, 15, 30, 0.85); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 8px; padding: 8px 10px; font-family: var(--font-body); font-size: 12px; outline: none; margin-bottom: 8px; cursor: pointer; width: 100%;">
+                                <option value="direct">直譯模式 (Legacy, 1m精度)</option>
+                                <option value="normalized" selected>科學歸一化模式 (GeoTIFF, 6cm精度)</option>
+                            </select>
+                        </div>
+                        <div class="control-row">
+                            <span class="control-label">海拔修正係數 (Scale Factor):</span>
+                            <div class="slider-val-row">
+                                <input type="range" id="scale-factor-slider" min="0.5" max="2.0" value="1.0" step="0.05" class="custom-slider small-slider">
+                                <span class="slider-val-display"><span id="scale-factor-val">1.0</span>x</span>
+                            </div>
+                        </div>
+                        <div class="control-row" style="margin-top: 8px;">
+                            <span class="control-label">海拔偏移修正 (Correction Offset):</span>
+                            <div class="slider-val-row">
+                                <input type="range" id="offset-correction-slider" min="-10" max="10" value="0.0" step="0.5" class="custom-slider small-slider">
+                                <span class="slider-val-display"><span id="offset-correction-val">0.0</span>m</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Statistics Card -->
+                <section class="card stats-card">
+                    <div class="card-header">
+                        <h2 class="card-title"><i data-lucide="bar-chart-3"></i> 即時衝擊評估</h2>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">淹水面積比例</span>
+                            <span class="stat-value text-danger" id="stat-flooded-percent">0.00%</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">淹水陸地面積</span>
+                            <span class="stat-value text-danger" id="stat-flooded-area">0 km²</span>
+                        </div>
+                        <div class="stat-item" id="stat-population-wrapper">
+                            <span class="stat-label">估算受影響人口</span>
+                            <span class="stat-value text-warning" id="stat-affected-population">0 人</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">海拔 10m 以下比例</span>
+                            <span class="stat-value" id="stat-low-lying">~12.5%</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Vulnerable Regions Card -->
+                <section class="card regions-card">
+                    <div class="card-header">
+                        <h2 class="card-title"><i data-lucide="globe"></i> 區域與全球衝擊評估</h2>
+                    </div>
+                    
+                    <!-- Tab Switcher -->
+                    <div class="tab-switcher">
+                        <button class="tab-btn active" data-tab="taiwan">台灣區域</button>
+                        <button class="tab-btn" data-tab="china">中國省份</button>
+                        <button class="tab-btn" data-tab="world">世界城市</button>
+                    </div>
+
+                    <!-- Tab Panels -->
+                    <div class="tab-content active" id="tab-taiwan">
+                        <ul class="region-list">
+                            <li class="region-item" data-region="taipei">
+                                <span class="region-name">台北盆地 (Taipei Basin)</span>
+                                <span class="region-status status-safe" id="status-taipei">安全</span>
+                            </li>
+                            <li class="region-item" data-region="yilan">
+                                <span class="region-name">宜蘭平原 (Yilan Plain)</span>
+                                <span class="region-status status-safe" id="status-yilan">安全</span>
+                            </li>
+                            <li class="region-item" data-region="chianan">
+                                <span class="region-name">嘉南平原 (Chianan Plain)</span>
+                                <span class="region-status status-safe" id="status-chianan">安全</span>
+                            </li>
+                            <li class="region-item" data-region="kaohsiung">
+                                <span class="region-name">高雄沿海 (Kaohsiung Coast)</span>
+                                <span class="region-status status-safe" id="status-kaohsiung">安全</span>
+                            </li>
+                            <li class="region-item" data-region="huadong">
+                                <span class="region-name">花東沿海 (Huadong Coast)</span>
+                                <span class="region-status status-safe" id="status-huadong">安全</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="tab-content" id="tab-china">
+                        <ul class="region-list">
+                            <li class="region-item" data-region="china_shanghai">
+                                <span class="region-name">上海市 (Shanghai)</span>
+                                <span class="region-status status-safe" id="status-china_shanghai">安全</span>
+                            </li>
+                            <li class="region-item" data-region="china_guangdong">
+                                <span class="region-name">廣東省 (Guangdong)</span>
+                                <span class="region-status status-safe" id="status-china_guangdong">安全</span>
+                            </li>
+                            <li class="region-item" data-region="china_jiangsu">
+                                <span class="region-name">江蘇省 (Jiangsu)</span>
+                                <span class="region-status status-safe" id="status-china_jiangsu">安全</span>
+                            </li>
+                            <li class="region-item" data-region="china_zhejiang">
+                                <span class="region-name">浙江省 (Zhejiang)</span>
+                                <span class="region-status status-safe" id="status-china_zhejiang">安全</span>
+                            </li>
+                            <li class="region-item" data-region="china_fujian">
+                                <span class="region-name">福建省 (Fujian)</span>
+                                <span class="region-status status-safe" id="status-china_fujian">安全</span>
+                            </li>
+                            <li class="region-item" data-region="china_tianjin">
+                                <span class="region-name">天津市 (Tianjin)</span>
+                                <span class="region-status status-safe" id="status-china_tianjin">安全</span>
+                            </li>
+                            <li class="region-item" data-region="china_hongkong">
+                                <span class="region-name">香港特區 (Hong Kong)</span>
+                                <span class="region-status status-safe" id="status-china_hongkong">安全</span>
+                            </li>
+                            <li class="region-item" data-region="china_beijing">
+                                <span class="region-name">北京市 (Beijing)</span>
+                                <span class="region-status status-safe" id="status-china_beijing">安全</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="tab-content" id="tab-world">
+                        <ul class="region-list">
+                            <li class="region-item" data-region="world_amsterdam">
+                                <span class="region-name">阿姆斯特丹 (Amsterdam)</span>
+                                <span class="region-status status-safe" id="status-world_amsterdam">安全</span>
+                            </li>
+                            <li class="region-item" data-region="world_venice">
+                                <span class="region-name">威尼斯 (Venice)</span>
+                                <span class="region-status status-safe" id="status-world_venice">安全</span>
+                            </li>
+                            <li class="region-item" data-region="world_bangkok">
+                                <span class="region-name">曼谷 (Bangkok)</span>
+                                <span class="region-status status-safe" id="status-world_bangkok">安全</span>
+                            </li>
+                            <li class="region-item" data-region="world_singapore">
+                                <span class="region-name">新加坡 (Singapore)</span>
+                                <span class="region-status status-safe" id="status-world_singapore">安全</span>
+                            </li>
+                            <li class="region-item" data-region="world_tokyo">
+                                <span class="region-name">東京 (Tokyo)</span>
+                                <span class="region-status status-safe" id="status-world_tokyo">安全</span>
+                            </li>
+                            <li class="region-item" data-region="world_jakarta">
+                                <span class="region-name">雅加達 (Jakarta)</span>
+                                <span class="region-status status-safe" id="status-world_jakarta">安全</span>
+                            </li>
+                            <li class="region-item" data-region="world_newyork">
+                                <span class="region-name">紐約 (New York)</span>
+                                <span class="region-status status-safe" id="status-world_newyork">安全</span>
+                            </li>
+                            <li class="region-item" data-region="world_london">
+                                <span class="region-name">倫敦 (London)</span>
+                                <span class="region-status status-safe" id="status-world_london">安全</span>
+                            </li>
+                            <li class="region-item" data-region="world_miami">
+                                <span class="region-name">邁阿密 (Miami)</span>
+                                <span class="region-status status-safe" id="status-world_miami">安全</span>
+                            </li>
+                            <li class="region-item" data-region="world_neworleans">
+                                <span class="region-name">新奧爾良 (New Orleans)</span>
+                                <span class="region-status status-safe" id="status-world_neworleans">安全</span>
+                            </li>
+                            <li class="region-item" data-region="world_male">
+                                <span class="region-name">馬累 (Malé)</span>
+                                <span class="region-status status-safe" id="status-world_male">安全</span>
+                            </li>
+                            <li class="region-item" data-region="world_alexandria">
+                                <span class="region-name">亞歷山大 (Alexandria)</span>
+                                <span class="region-status status-safe" id="status-world_alexandria">安全</span>
+                            </li>
+                            <li class="region-item" data-region="world_sydney">
+                                <span class="region-name">雪梨 (Sydney)</span>
+                                <span class="region-status status-safe" id="status-world_sydney">安全</span>
+                            </li>
+                            <li class="region-item" data-region="world_mumbai">
+                                <span class="region-name">孟買 (Mumbai)</span>
+                                <span class="region-status status-safe" id="status-world_mumbai">安全</span>
+                            </li>
+                            <li class="region-item" data-region="world_rio">
+                                <span class="region-name">里約熱內盧 (Rio de Janeiro)</span>
+                                <span class="region-status status-safe" id="status-world_rio">安全</span>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Information/Education Card -->
+                <section class="card info-card">
+                    <div class="card-header">
+                        <h2 class="card-title"><i data-lucide="info"></i> 科普知識</h2>
+                    </div>
+                    <p class="info-text">
+                        台灣的政經中心、精華農田與工業重鎮多集中於西部沿海平原及低窪盆地。
+                    </p>
+                    <p class="info-text highlight">
+                        當海平面上升 <strong>1 至 5 公尺</strong>時，台南、高雄沿海、嘉南平原以及宜蘭平原的低窪地區將首當其衝。若上升達到 <strong>10 公尺</strong>，台北盆地（雙北核心區）將因淡水河口海水倒灌而面臨大規模淹水威脅。
+                    </p>
+                </section>
+            </div>
+
+            <footer class="sidebar-footer">
+                <p>資料來源: AWS Terrarium Elevation Tiles (30m)</p>
+                <p>&copy; 2026 台灣地形淹水模擬器</p>
+            </footer>
+        </aside>
+
+        <!-- Main Map Area -->
+        <main class="map-wrapper">
+            <div id="map"></div>
+            
+            <!-- Map Overlay Panels -->
+            <!-- Hover Elevation Info -->
+            <div id="hover-info-panel" class="map-overlay-panel">
+                <div class="panel-header">
+                    <i data-lucide="compass" class="panel-icon"></i>
+                    <span>滑鼠位置資訊</span>
+                </div>
+                <div class="panel-body">
+                    <div class="info-row">
+                        <span class="info-label">經緯度:</span>
+                        <span class="info-val" id="hover-coords">--</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">海拔高度:</span>
+                        <span class="info-val highlight-val" id="hover-elevation">--</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">狀態評估:</span>
+                        <span class="info-val" id="hover-status">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Elevation Legend -->
+            <div id="legend-panel" class="map-overlay-panel legend-panel">
+                <div class="legend-title">高度與水深圖例</div>
+                <div class="legend-item">
+                    <span class="legend-color water-deep"></span>
+                    <span class="legend-label">深水區 (&gt; 15m)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color water-medium"></span>
+                    <span class="legend-label">中度淹水 (5m - 15m)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color water-shallow"></span>
+                    <span class="legend-label">淺水區 (0m - 5m)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color land-low"></span>
+                    <span class="legend-label">極低窪陸地 (&lt; 10m)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color land-high"></span>
+                    <span class="legend-label">一般陸地</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Leaflet MarkerCluster JS -->
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    
+    <!-- Custom JS Data and App Logic -->
+    <script src="assets/taiwan_data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
