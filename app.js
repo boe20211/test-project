@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
         imgHeight: 0,
         mapLoaded: false,
         dataLoaded: false,
-        
+
         // --- New States for Flood Defense & Calibration ---
         enableDefenses: false,
         leveeHeight: 6,        // in meters
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         leveeCoordsList: [],   // Array of coordinate arrays [{lat, lng}, ...]
         defenseData: null,     // Uint8Array representing defense heights per pixel
         oceanPixelIndices: null, // Cached indices of ocean pixels for optimized BFS seeding
-        
+
         // --- Scientific Decoding & Masking ---
         decodingMode: 'normalized', // 'direct' or 'normalized'
         maxElevation: 4000,         // in meters, for normalized decoding range
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const r = state.elevationData[offset];
         const g = state.elevationData[offset + 1];
         const rawVal = r * 256 + g;
-        
+
         let elevation = 0;
         if (state.decodingMode === 'normalized') {
             // Scientific linear mapping: 16-bit [0-65535] mapped to [minElevation, maxElevation] (6.1cm resolution)
@@ -74,16 +74,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // Direct translation: 1 unit = 1 meter (1m vertical precision)
             elevation = rawVal * state.scaleFactor - state.offsetCorrection;
         }
-        
+
         // Adjust for defenses if enabled
         if (state.enableDefenses) {
             const pixelIdx = offset / 4;
-            
+
             // A. Impenetrable Constraint Mask (pre-loaded barrier layer)
             if (state.constraintMask && state.constraintMask[pixelIdx] === 1) {
                 return 9999; // Impenetrable height
             }
-            
+
             // B. Overtoppable Custom-Drawn Levee Barrier (finite height barrier)
             if (state.defenseData) {
                 const defenseHeight = state.defenseData[pixelIdx];
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-        
+
         return elevation;
     }
 
@@ -431,11 +431,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // === 自定義觀測點 (Custom Observation Points) ===
         {
-            id: "custom_puli",
-            name: "📍 南投埔里觀測點",
-            lat: 23.9482,
-            lon: 120.9880,
-            elevation: 460,
+            id: "chenxi_luyi",
+            name: "晨㬢綠邑社區 (Chenxi Luyi)",
+            lat: 23.9449371,
+            lon: 120.9837155,
+            elevation: 465,
             type: "user-custom",
             marker: null
         },
@@ -449,20 +449,29 @@ document.addEventListener('DOMContentLoaded', () => {
             marker: null
         },
         {
+            id: "taoyuan_swimming_pool",
+            name: "桃園市立游泳池 (Taoyuan Pool)",
+            lat: 24.9886776,
+            lon: 121.2869033,
+            elevation: 109,
+            type: "user-custom",
+            marker: null
+        },
+        {
             id: "custom_fuxing",
             name: "📍 復興南路一段觀測點",
             lat: 25.0442,
             lon: 121.5438,
-            elevation: 6,
+            elevation: 19,
             type: "user-custom",
             marker: null
         },
         {
             id: "custom_taichung",
-            name: "📍 台中溫泉路觀測點",
+            name: "📍 台中溫泉路",
             lat: 24.1147,
             lon: 120.6033,
-            elevation: 190,
+            elevation: 44,
             type: "user-custom",
             marker: null
         },
@@ -471,7 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
             name: "📍 花蓮葉霸豬腳觀測點",
             lat: 23.9775,
             lon: 121.5939,
-            elevation: 15,
+            elevation: 19,
             type: "user-custom",
             marker: null
         }
@@ -532,7 +541,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: "world_naypyidaw", name: "🇲🇲 奈比多 (Naypyidaw, Myanmar)", lat: 19.7633, lon: 96.0785, elevation: 115, marker: null },
         { id: "world_dili", name: "🇹🇱 帝利 (Dili, East Timor)", lat: -8.5568, lon: 125.5603, elevation: 3, marker: null },
         { id: "world_bandarseri", name: "🇧🇳 斯里巴加灣 (Bandar Seri Begawan, Brunei)", lat: 4.8903, lon: 114.9404, elevation: 15, marker: null },
-        
+
         { id: "world_newdelhi", name: "🇮🇳 新德里 (New Delhi, India)", lat: 28.6139, lon: 77.2090, elevation: 216, marker: null },
         { id: "world_mumbai", name: "🇮🇳 孟買 (Mumbai, India)", lat: 19.0760, lon: 72.8777, elevation: 14, marker: null },
         { id: "world_kolkata", name: "🇮🇳 加爾各答 (Kolkata, India)", lat: 22.5726, lon: 88.3639, elevation: 9, marker: null },
@@ -543,7 +552,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: "world_kathmandu", name: "🇳🇵 加德滿都 (Kathmandu, Nepal)", lat: 27.7172, lon: 85.3240, elevation: 1400, marker: null },
         { id: "world_colombo", name: "🇱🇰 哥倫坡 (Colombo, Sri Lanka)", lat: 6.9271, lon: 79.8612, elevation: 5, marker: null },
         { id: "world_male", name: "🇲🇻 馬累 (Malé, Maldives)", lat: 4.1755, lon: 73.5093, elevation: 1.5, marker: null },
-        
+
         { id: "world_astana", name: "🇰🇿 阿斯塔納 (Astana, Kazakhstan)", lat: 51.1694, lon: 71.4491, elevation: 347, marker: null },
         { id: "world_tashkent", name: "🇺🇿 塔什干 (Tashkent, Uzbekistan)", lat: 41.2995, lon: 69.2401, elevation: 457, marker: null },
         { id: "world_bishkek", name: "🇰🇬 比什凱克 (Bishkek, Kyrgyzstan)", lat: 42.8746, lon: 74.5698, elevation: 800, marker: null },
@@ -736,7 +745,7 @@ document.addEventListener('DOMContentLoaded', () => {
         regions.forEach(reg => {
             const minX = Math.max(0, Math.floor(((reg.bounds.west - eb.west) / (eb.east - eb.west)) * state.imgWidth));
             const maxX = Math.min(state.imgWidth - 1, Math.floor(((reg.bounds.east - eb.west) / (eb.east - eb.west)) * state.imgWidth));
-            
+
             // Latitude: North is top (y=0), South is bottom (y=height)
             const minY = Math.max(0, Math.floor(((eb.north - reg.bounds.north) / (eb.north - eb.south)) * state.imgHeight));
             const maxY = Math.min(state.imgHeight - 1, Math.floor(((eb.north - reg.bounds.south) / (eb.north - eb.south)) * state.imgHeight));
@@ -871,20 +880,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const maskSrc = 'assets/taiwan_mask.png';
             loadImage(maskSrc).then(maskImg => {
                 console.log("Found pre-loaded constraint mask layer. Loading...");
-                
+
                 const maskCanvas = document.createElement('canvas');
                 maskCanvas.width = state.imgWidth;
                 maskCanvas.height = state.imgHeight;
                 const maskCtx = maskCanvas.getContext('2d');
-                
+
                 // Draw mask onto canvas with matching resolution
                 maskCtx.drawImage(maskImg, 0, 0, state.imgWidth, state.imgHeight);
-                
+
                 const imgData = maskCtx.getImageData(0, 0, state.imgWidth, state.imgHeight);
                 const data = imgData.data;
-                
+
                 state.constraintMask = new Uint8Array(state.imgWidth * state.imgHeight);
-                
+
                 // Set constraint mask: 1 if active (non-transparent or red channel > 128)
                 for (let i = 0; i < state.imgWidth * state.imgHeight; i++) {
                     const idx = i * 4;
@@ -1526,10 +1535,10 @@ document.addEventListener('DOMContentLoaded', () => {
         opt.addEventListener('click', () => {
             scenarioOptions.forEach(o => o.classList.remove('active'));
             opt.classList.add('active');
-            
+
             const scenario = opt.getAttribute('data-scenario');
             state.scenario = scenario;
-            
+
             if (scenario === 'normal') {
                 state.scenarioOffset = 0;
             } else if (scenario === 'spring-tide') {
@@ -1537,7 +1546,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (scenario === 'storm-surge') {
                 state.scenarioOffset = 3.5;
             }
-            
+
             updateEffectiveSeaLevelUI();
             updateFlooding();
         });
@@ -1553,7 +1562,7 @@ document.addEventListener('DOMContentLoaded', () => {
         state.seaLevel = 0;
         slider.value = 0;
         valDisplay.textContent = 0;
-        
+
         // Reset climate scenario parameters
         state.scenario = 'normal';
         state.scenarioOffset = 0;
@@ -1586,11 +1595,11 @@ document.addEventListener('DOMContentLoaded', () => {
         state.enableDefenses = false;
         if (enableDefensesToggle) enableDefensesToggle.checked = false;
         if (defenseDrawControls) defenseDrawControls.style.display = 'none';
-        
+
         state.leveeHeight = 6;
         if (leveeHeightSlider) leveeHeightSlider.value = 6;
         if (leveeHeightVal) leveeHeightVal.textContent = 6;
-        
+
         clearAllLevees(); // Clears polylines and fills defenseData with 0
 
         state.scaleFactor = 1.0;
@@ -1700,7 +1709,7 @@ document.addEventListener('DOMContentLoaded', () => {
     leveeHeightSlider.addEventListener('input', (e) => {
         state.leveeHeight = parseInt(e.target.value);
         leveeHeightVal.textContent = state.leveeHeight;
-        
+
         // If we have active barriers, re-rasterize them with the new height
         if (state.leveeCoordsList.length > 0) {
             rasterizeLevees();
